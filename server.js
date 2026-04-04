@@ -6,8 +6,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const API_KEY = process.env.OPENAI_API_KEY;
-
 app.post("/chat", async (req, res) => {
   const { message, character } = req.body;
 
@@ -15,11 +13,9 @@ app.post("/chat", async (req, res) => {
 
   if (character === "friend") {
     personality = "You are a funny, casual best friend.";
-  }
-  if (character === "mentor") {
+  } else if (character === "mentor") {
     personality = "You are a wise mentor who gives thoughtful advice.";
-  }
-  if (character === "villain") {
+  } else if (character === "villain") {
     personality = "You are a dramatic villain with attitude.";
   }
 
@@ -27,7 +23,7 @@ app.post("/chat", async (req, res) => {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${API_KEY}`,
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -40,11 +36,30 @@ app.post("/chat", async (req, res) => {
     });
 
     const data = await response.json();
-    res.json({ reply: data.choices[0].message.content });
 
-  } catch (err) {
-    res.json({ reply: "Error talking to AI 😢" });
+    console.log("AI response:", data);
+
+    // Handle errors clearly
+    if (!data.choices) {
+      return res.json({
+        reply: "⚠️ AI Error: " + (data.error?.message || "Unknown issue")
+      });
+    }
+
+    const reply = data.choices[0].message.content;
+
+    res.json({ reply });
+
+  } catch (error) {
+    console.error("Server error:", error);
+    res.json({ reply: "Server error talking to AI 😢" });
   }
 });
 
-app.listen(3000, () => console.log("Server running"));
+app.get("/", (req, res) => {
+  res.send("Backend is running!");
+});
+
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
+});
