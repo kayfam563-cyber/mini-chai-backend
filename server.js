@@ -1,4 +1,4 @@
-import express from "express";
+console.log("ENV KEY:", process.env.OPENAI_API_KEY);import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
 
