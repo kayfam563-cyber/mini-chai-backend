@@ -6,40 +6,39 @@ app.use(cors());
 app.use(express.json());
 
 function generateReply(message, personality) {
+function generateReply(message, personality) {
   const msg = message.toLowerCase();
 
+  // base responses
+  let reply = "";
+
   if (msg.includes("hello") || msg.includes("hi")) {
-    return "Heyyy 😄 what's up?";
+    reply = "Hey 😄 what's going on?";
+  } else if (msg.includes("how are you")) {
+    reply = "I'm doing pretty good honestly. How about you?";
+  } else if (msg.includes("story")) {
+    reply = "Alright… 🌌\n\nThere was once a city where nobody could lie. One day, someone whispered something forbidden—and reality started breaking...";
+  } else if (msg.includes("sad")) {
+    reply = "Hey… I'm here with you. You don't have to go through it alone 💛";
+  } else {
+    reply = "Hmm… tell me more 🤔";
   }
 
-  if (msg.includes("how are you")) {
-    return "I'm doing pretty good honestly 😌 what about you?";
+  // personality layer (this makes it feel real)
+  if (personality === "friend") {
+    reply = reply + " 😂 not gonna lie that's kinda wild";
   }
 
-  if (msg.includes("story")) {
-    return "Alright listen… 🌌\n\nThere was once a city where nobody could lie. One day, a girl whispered a secret—and suddenly, the entire world started glitching...";
+  if (personality === "mentor") {
+    reply = "Take a moment to reflect. " + reply;
   }
 
-  if (msg.includes("sad")) {
-    return "Hey… it's okay to feel like that sometimes 💛 I'm here with you.";
+  if (personality === "villain") {
+    reply = reply + "…how intriguing 😈";
   }
 
-  // personality flavor
-  if (personality.includes("villain")) {
-    return "Interesting... your words amuse me 😈 but continue.";
-  }
-
-  if (personality.includes("mentor")) {
-    return "Think deeply about that. The answer is already within you.";
-  }
-
-  if (personality.includes("friend")) {
-    return "LOL wait that's actually crazy 😂 tell me more";
-  }
-
-  return "Hmm… tell me more about that 🤔";
-}
-
+  return reply;
+      }
 app.post("/chat", (req, res) => {
   const { message, character } = req.body;
 
