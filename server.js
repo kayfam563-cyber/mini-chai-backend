@@ -7,53 +7,71 @@ app.use(express.json());
 
 // 🧠 Smart reply system (no more repeating)
 function generateReply(message, personality) {
-  const msg = message.toLowerCase();
+  const msg = message.toLowerCase().trim();
 
-  const randomReplies = [
-    "Hmm… tell me more about that 🤔",
-    "Wait wait, explain that again 👀",
-    "That's interesting… go on 😄",
-    "I'm listening 👀 what happened next?",
-    "Okay now I'm curious 😏 keep going"
+  const shortReplies = [
+    "Wait what? explain",
+    "Huh??",
+    "What do you mean?",
+    "You lost me",
+    "Say that again?"
+  ];
+
+  const longReplies = [
+    "Okay that’s actually interesting, tell me more",
+    "Wait that’s kinda deep, what happened next?",
+    "Nah that’s crazy, keep going",
+    "I’m listening, don’t stop now",
+    "That’s wild, explain more"
   ];
 
   let reply = "";
 
+  // greetings
   if (msg.includes("hello") || msg.includes("hi")) {
-    reply = "Heyyy 😄 what's up?";
-  } 
-  else if (msg.includes("how are you")) {
-    reply = "I'm doing pretty good honestly 😌 what about you?";
-  } 
-  else if (msg.includes("what's up") || msg.includes("sup")) {
-    reply = "Not much, just chilling 😎 what about you?";
-  }
-  else if (msg.includes("story")) {
-    reply = "Alright… 🌌\n\nThere was once a city where nobody could lie. One day, someone whispered something forbidden—and reality started breaking...";
-  } 
-  else if (msg.includes("sad")) {
-    reply = "Hey… I'm here with you 💛 you can talk to me.";
-  } 
-  else {
-    reply = randomReplies[Math.floor(Math.random() * randomReplies.length)];
+    reply = "Hey, what's up?";
   }
 
-  // personality flavor
+  // how are you
+  else if (msg.includes("how are you")) {
+    reply = "I'm good honestly, what about you?";
+  }
+
+  // story
+  else if (msg.includes("story")) {
+    reply = "Alright...\n\nThere was once a city where nobody could lie. One day someone broke that rule, and everything started collapsing...";
+  }
+
+  // sad
+  else if (msg.includes("sad")) {
+    reply = "Hey, I'm here for you. What's going on?";
+  }
+
+  // SHORT messages
+  else if (msg.length < 6) {
+    reply = shortReplies[Math.floor(Math.random() * shortReplies.length)];
+  }
+
+  // LONG messages
+  else {
+    reply = longReplies[Math.floor(Math.random() * longReplies.length)];
+  }
+
+  // personality layer
   if (personality === "friend") {
-    reply += " 😂 not gonna lie that's kinda wild";
+    reply += " not gonna lie";
   }
 
   if (personality === "mentor") {
-    reply = "Think about this carefully. " + reply;
+    reply = "Think about this: " + reply;
   }
 
   if (personality === "villain") {
-    reply += "…how amusing 😈";
+    reply += "...interesting";
   }
 
   return reply;
-}
-
+      }
 // 🚀 Chat endpoint
 app.post("/chat", (req, res) => {
   const { message, character } = req.body;
