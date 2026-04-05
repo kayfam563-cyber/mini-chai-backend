@@ -5,25 +5,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🧠 Smart reply system (no more repeating)
+// 🧠 Memory storage (simple version)
+let chatHistory = [];
+
+// 🧠 Smarter reply using context
 function generateReply(message, personality) {
   const msg = message.toLowerCase().trim();
 
-  const shortReplies = [
-    "Wait what? explain",
-    "Huh??",
-    "What do you mean?",
-    "You lost me",
-    "Say that again?"
-  ];
-
-  const longReplies = [
-    "Okay that’s actually interesting, tell me more",
-    "Wait that’s kinda deep, what happened next?",
-    "Nah that’s crazy, keep going",
-    "I’m listening, don’t stop now",
-    "That’s wild, explain more"
-  ];
+  // look at last message for context
+  const lastMessage = chatHistory.length > 0 
+    ? chatHistory[chatHistory.length - 1].user 
+    : "";
 
   let reply = "";
 
@@ -32,29 +24,30 @@ function generateReply(message, personality) {
     reply = "Hey, what's up?";
   }
 
-  // how are you
-  else if (msg.includes("how are you")) {
-    reply = "I'm good honestly, what about you?";
+  // confused replies
+  else if (msg.includes("what do you mean") || msg.includes("huh")) {
+    if (lastMessage.includes("story")) {
+      reply = "I was talking about the story I just mentioned.";
+    } else {
+      reply = "I'm just responding to what you said earlier.";
+    }
   }
 
-  // story
-  else if (msg.includes("story")) {
-    reply = "Alright...\n\nThere was once a city where nobody could lie. One day someone broke that rule, and everything started collapsing...";
+  // continue story
+  else if (msg.includes("story") || lastMessage.includes("story")) {
+    reply = "Alright... continuing the story:\n\nThe sky started flickering like a broken screen, and people began forgetting who they were...";
   }
 
-  // sad
+  // emotional support
   else if (msg.includes("sad")) {
-    reply = "Hey, I'm here for you. What's going on?";
+    reply = "I'm here for you. Do you want to talk about it?";
   }
 
-  // SHORT messages
+  // general replies
   else if (msg.length < 6) {
-    reply = shortReplies[Math.floor(Math.random() * shortReplies.length)];
-  }
-
-  // LONG messages
-  else {
-    reply = longReplies[Math.floor(Math.random() * longReplies.length)];
+    reply = "Can you explain that a bit more?";
+  } else {
+    reply = "That's interesting. Tell me more about that.";
   }
 
   // personality layer
@@ -71,7 +64,8 @@ function generateReply(message, personality) {
   }
 
   return reply;
-      }
+}
+
 // 🚀 Chat endpoint
 app.post("/chat", (req, res) => {
   const { message, character } = req.body;
@@ -83,6 +77,17 @@ app.post("/chat", (req, res) => {
   if (character === "villain") personality = "villain";
 
   const reply = generateReply(message, personality);
+
+  // 🧠 save conversation
+  chatHistory.push({
+    user: message,
+    ai: reply
+  });
+
+  // limit memory (last 20 messages)
+  if (chatHistory.length > 20) {
+    chatHistory.shift();
+  }
 
   res.json({ reply });
 });
