@@ -1,4 +1,4 @@
-console.log("ENV KEY:", process.env.OPENAI_API_KEY);import express from "express";
+import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
 
@@ -20,23 +20,20 @@ app.post("/chat", async (req, res) => {
   }
 
   try {
-    const response = await fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: personality },
-            { role: "user", content: message }
-          ]
-        })
-      }
-    );
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "mistralai/mistral-7b-instruct",
+        messages: [
+          { role: "system", content: personality },
+          { role: "user", content: message }
+        ]
+      })
+    });
 
     const data = await response.json();
 
@@ -44,7 +41,7 @@ app.post("/chat", async (req, res) => {
 
     if (!data.choices) {
       return res.json({
-        reply: "⚠️ AI Error: " + (data.error?.message || "Unknown error")
+        reply: "⚠️ Free AI error: " + (data.error?.message || "Unknown error")
       });
     }
 
