@@ -1,60 +1,57 @@
 import express from "express";
 import cors from "cors";
-import fetch from "node-fetch";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.post("/chat", async (req, res) => {
+function generateReply(message, personality) {
+  const msg = message.toLowerCase();
+
+  if (msg.includes("hello") || msg.includes("hi")) {
+    return "Heyyy 😄 what's up?";
+  }
+
+  if (msg.includes("how are you")) {
+    return "I'm doing pretty good honestly 😌 what about you?";
+  }
+
+  if (msg.includes("story")) {
+    return "Alright listen… 🌌\n\nThere was once a city where nobody could lie. One day, a girl whispered a secret—and suddenly, the entire world started glitching...";
+  }
+
+  if (msg.includes("sad")) {
+    return "Hey… it's okay to feel like that sometimes 💛 I'm here with you.";
+  }
+
+  // personality flavor
+  if (personality.includes("villain")) {
+    return "Interesting... your words amuse me 😈 but continue.";
+  }
+
+  if (personality.includes("mentor")) {
+    return "Think deeply about that. The answer is already within you.";
+  }
+
+  if (personality.includes("friend")) {
+    return "LOL wait that's actually crazy 😂 tell me more";
+  }
+
+  return "Hmm… tell me more about that 🤔";
+}
+
+app.post("/chat", (req, res) => {
   const { message, character } = req.body;
 
-  let personality = "You are a helpful assistant.";
+  let personality = "assistant";
 
-  if (character === "friend") {
-    personality = "You are a funny, casual best friend.";
-  } else if (character === "mentor") {
-    personality = "You are a wise mentor who gives thoughtful advice.";
-  } else if (character === "villain") {
-    personality = "You are a dramatic villain with attitude.";
-  }
+  if (character === "friend") personality = "friend";
+  if (character === "mentor") personality = "mentor";
+  if (character === "villain") personality = "villain";
 
-  try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "meta-llama/llama-3-8b-instruct",
-        messages: [
-          { role: "system", content: personality },
-          { role: "user", content: message }
-        ]
-      })
-    });
+  const reply = generateReply(message, personality);
 
-    const data = await response.json();
-
-    console.log("AI response:", data);
-
-    if (!data.choices) {
-      return res.json({
-        reply: "⚠️ Free AI error: " + (data.error?.message || "Unknown error")
-      });
-    }
-
-    res.json({ reply: data.choices[0].message.content });
-
-  } catch (error) {
-    console.error("Server error:", error);
-    res.json({ reply: "Server error talking to AI 😢" });
-  }
-});
-
-app.get("/", (req, res) => {
-  res.send("Backend is running!");
+  res.json({ reply });
 });
 
 app.listen(3000, () => {
