@@ -8,38 +8,6 @@ app.use(express.json());
 function generateReply(message, personality) {
   const msg = message.toLowerCase();
 
-  // base responses
-  let reply = "";
-
-  if (msg.includes("hello") || msg.includes("hi")) {
-    reply = "Hey 😄 what's going on?";
-  } else if (msg.includes("how are you")) {
-    reply = "I'm doing pretty good honestly. How about you?";
-  } else if (msg.includes("story")) {
-    reply = "Alright… 🌌\n\nThere was once a city where nobody could lie. One day, someone whispered something forbidden—and reality started breaking...";
-  } else if (msg.includes("sad")) {
-    reply = "Hey… I'm here with you. You don't have to go through it alone 💛";
-  } else {
-    reply = "Hmm… tell me more 🤔";
-  }
-
-  // personality layer (this makes it feel real)
-  if (personality === "friend") {
-    reply = reply + " 😂 not gonna lie that's kinda wild";
-  }
-
-  if (personality === "mentor") {
-    reply = "Take a moment to reflect. " + reply;
-  }
-
-  if (personality === "villain") {
-    reply = reply + "…how intriguing 😈";
-  }
-
-  return reply;
-}
-  const msg = message.toLowerCase();
-
   if (msg.includes("hello") || msg.includes("hi")) {
     return "Heyyy 😄 what's up?";
   }
