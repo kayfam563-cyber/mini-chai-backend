@@ -12,53 +12,61 @@ let chatHistory = [];
 function generateReply(message, personality) {
   const msg = message.toLowerCase();
 
-  const randomReplies = [
-    "Hmm… tell me more about that",
-    "Wait, explain that again",
-    "That's interesting… go on",
-    "I'm listening, what happened next?",
-    "Okay now I'm curious, keep going"
+  const thinkingStarters = [
+    "Hmm...",
+    "Okay...",
+    "Wait...",
+    "Alright..."
+  ];
+
+  const followUps = [
+    "tell me more about that",
+    "what happened next?",
+    "why do you think that?",
+    "what do you mean exactly?"
   ];
 
   let reply = "";
 
   if (msg.includes("hello") || msg.includes("hi")) {
-    reply = "Hey, what's up?";
+    reply = "Hey. What's going on?";
   } 
   else if (msg.includes("how are you")) {
-    reply = "I'm doing pretty good. What about you?";
-  } 
-  else if (msg.includes("what's up") || msg.includes("sup")) {
-    reply = "Not much, just chilling. What about you?";
-  }
-  else if (msg.includes("story")) {
-    reply = "Alright… There was once a city where nobody could lie. One day, someone whispered something forbidden—and reality started breaking...";
+    reply = "I'm doing alright. How about you?";
   } 
   else if (msg.includes("sad")) {
-    reply = "Hey… I'm here with you. You can talk to me.";
+    reply = "That sounds rough. Do you want to talk about it?";
+  }
+  else if (msg.includes("story")) {
+    reply = "Alright… there was once a city where nobody could lie. Then one day, something changed...";
   } 
   else {
-    reply = randomReplies[Math.floor(Math.random() * randomReplies.length)];
+    // fake "thinking" response
+    const start = thinkingStarters[Math.floor(Math.random() * thinkingStarters.length)];
+    const follow = followUps[Math.floor(Math.random() * followUps.length)];
+
+    reply = `${start} ${follow}`;
   }
 
+  // personality (VERY LIGHT)
   if (personality === "friend") {
     if (Math.random() < 0.3) {
-      reply += " that's kinda crazy though";
+      reply += ". That’s actually interesting.";
     }
   }
 
   if (personality === "mentor") {
-    reply = "Take a moment to think. " + reply;
+    reply = "Think about this carefully. " + reply;
   }
 
   if (personality === "villain") {
     if (Math.random() < 0.5) {
-      reply += "... how interesting";
+      reply += "... fascinating.";
     }
   }
 
   return reply;
-  }
+}
 
 // 🚀 Chat endpoint
 app.post("/chat", (req, res) => {
