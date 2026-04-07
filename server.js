@@ -14,56 +14,7 @@ function generateReply(message, personality) {
 
   // look at last message for context
   const lastMessage = chatHistory.length > 0 
-    ? chatHistory[chatHistory.length - 1].user 
-    : "";
-
-  let reply = "";
-
-  // greetings
-  if (msg.includes("hello") || msg.includes("hi")) {
-    reply = "Hey, what's up?";
-  }
-
-  // confused replies
-  else if (msg.includes("what do you mean") || msg.includes("huh")) {
-    if (lastMessage.includes("story")) {
-      reply = "I was talking about the story I just mentioned.";
-    } else {
-      reply = "I'm just responding to what you said earlier.";
-    }
-  }
-
-  // continue story
-  else if (msg.includes("story") || lastMessage.includes("story")) {
-    reply = "Alright... continuing the story:\n\nThe sky started flickering like a broken screen, and people began forgetting who they were...";
-  }
-
-  // emotional support
-  else if (msg.includes("sad")) {
-    reply = "I'm here for you. Do you want to talk about it?";
-  }
-
-  // general replies
-  else if (msg.length < 6) {
-    reply = "Can you explain that a bit more?";
-  } else {
-    reply = "That's interesting. Tell me more about that.";
-  }
-
-  // personality layer
-  if (personality === "friend") {
-    reply += " not gonna lie";
-  }
-
-  if (personality === "mentor") {
-    reply = "Think about this: " + reply;
-  }
-
-  if (personality === "villain") {
-    reply += "...interesting";
-  }
-
-  return reply;
+  
 }
 
 // 🚀 Chat endpoint
